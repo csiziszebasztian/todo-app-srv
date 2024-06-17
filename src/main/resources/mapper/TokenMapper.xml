@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lifecraft.todoappspringbootsrv.mapper.TokenMapper">
+
+    <resultMap id="tokenResultMap" type="Token">
+        <id property="id" column="id"/>
+        <result property="tokenStr" column="token"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="expiredAt" column="expired_at"/>
+        <result property="createdAt" column="created_at"/>
+        <association property="user" javaType="User" column="user_id" resultMap="com.lifecraft.todoappspringbootsrv.mapper.UserMapper.userResultMap"/>
+    </resultMap>
+
+    <select id="create" resultMap="tokenResultMap">
+        INSERT INTO tokens (token, user_id)
+        VALUES (#{token}, #{user_id})
+        RETURNING
+        id,
+        token,
+        created_at,
+        expired_at,
+        created_at
+    </select>
+
+    <select id="getTokenByToken" resultMap="tokenResultMap">
+        SELECT
+            t.id,
+            t.token_str,
+            t.created_at,
+            t.expired_at,
+            t.validated_at,
+            u.id,
+            u.name,
+            u.email,
+        FROM tokens t
+        JOIN user u ON t.user_id = u.id
+        WHERE t.token = #{token}
+    </select>
+
+    <update id="updateValidateById">
+        UPDATE tokens
+        SET validated_at = NOW()
+        WHERE id = #{id};
+    </update>
+
+</mapper>
